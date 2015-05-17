@@ -12,7 +12,7 @@ typedef NS_ENUM(int, OpMethod)
 {
     OpViewHtml,
     OpExportCsv,
-    OpExportWindowsCsv,
+    OpExprotWindowsCsv,
     OpExportHtml
 
 };
@@ -32,8 +32,8 @@ typedef NS_ENUM(int, OpMethod)
         item.tag = OpExportCsv;
         item.target = self;
         [self addItem:item];
-        item = [[NSMenuItem alloc] initWithTitle:@"Export as Winodws CSV" action:@selector(onMenuClick:) keyEquivalent:@""];
-        item.tag = OpExportWindowsCsv;
+        item = [[NSMenuItem alloc] initWithTitle:@"Export as Windows CSV" action:@selector(onMenuClick:) keyEquivalent:@""];
+        item.tag = OpExprotWindowsCsv;
         item.target = self;
         [self addItem:item];
         item = [[NSMenuItem alloc] initWithTitle:@"Export as Html" action:@selector(onMenuClick:) keyEquivalent:@""];
@@ -104,6 +104,7 @@ typedef NS_ENUM(int, OpMethod)
      <style type='text/css'>\
      td {\
          max-width: 400px;\
+         word-wrap:break-word;\
      }\
      </style>\
      </head>\
@@ -135,13 +136,13 @@ typedef NS_ENUM(int, OpMethod)
     [panel setNameFieldStringValue:@"export"];
     [panel setMessage:@"Choose the path to save"];
     [panel setAllowsOtherFileTypes:NO];
-    [panel setAllowedFileTypes:@[@"csv", @"html"]];
+    [panel setAllowedFileTypes:@[suffix]];
     [panel setExtensionHidden:NO];
     [panel setCanCreateDirectories:YES];
     [panel beginSheetModalForWindow:self.tableView.window completionHandler:^(NSInteger result) {
         if (result == NSFileHandlingPanelOKButton) {
             NSString *path = [[panel URL] path];
-            [data writeToFile:path atomically:YES encoding:CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000) error:nil];
+            [data writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
         }
     }];
 }
@@ -155,7 +156,7 @@ typedef NS_ENUM(int, OpMethod)
             [self saveFile:@"csv" withData:data];
 
         }
-        case OpExportWindowsCsv: {
+        case OpExprotWindowsCsv: {
             NSString *data = [self genCsv:@","];
             [self saveFile:@"csv" withData:data];
         };
@@ -173,7 +174,7 @@ typedef NS_ENUM(int, OpMethod)
 //            NSString *path = [documentsDirectory stringByAppendingPathComponent:@"export.html"];
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             [dateFormatter setDateFormat:@"yyyyMMdd-HHmmss"];
-            NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@%@", [dateFormatter stringFromDate:[NSDate date]], @"export.html"]];
+            NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@%@",[dateFormatter stringFromDate:[NSDate date]],@"export.html"]];
             [data writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
             [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:path]];
         }
